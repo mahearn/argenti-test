@@ -1,5 +1,3 @@
-const express = require('express');
-const { get } = require('express/lib/response');
 const fs = require('fs');
 const nReadlines = require('n-readlines');
 const pokerHands = new nReadlines('poker-hands.txt');
