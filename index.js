@@ -2,7 +2,7 @@ const fs = require('fs');
 const nReadlines = require('n-readlines');
 const pokerHands = new nReadlines('poker-hands.txt');
 
-const order = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']; //ranking order from lowest to highest (A !== 1)
+const order = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']; //ranking order from lowest to highest
 
 let player1Hand = [],
   player2Hand = [],
@@ -13,11 +13,17 @@ function compareHands(h1, h2) {
   let h1Details = getHandDetails(h1),
     h2Details = getHandDetails(h2);
   if (h1Details.rank === h2Details.rank) {
-    if (h1Details.value > h2Details.value) {
+    if (h1Details.value < h2Details.value) {
       player1Score++;
-    } else if (h1Details.value < h2Details.value) {
+    } else if (h1Details.value > h2Details.value) {
       player2Score++;
+    } else {
+      return null;
     }
+  } else if (h1Details.rank < h2Details.rank) {
+    player1Score++;
+  } else {
+    player2Score++;
   }
 }
 
@@ -31,23 +37,24 @@ function getHandDetails(hand) {
   const flush = suits[0] === suits[4];
   const first = faces[0].charCodeAt(0);
   const straight = faces.every((f, index) => f.charCodeAt(0) - first === index);
+  // rank 1 - 9 (1 is highest)
   let rank =
-    (flush && straight && 10) ||
-    (duplicates[4] && 9) ||
-    (duplicates[3] && duplicates[2] && 8) ||
-    (flush && 7) ||
-    (straight && 6) ||
-    (duplicates[3] && 5) ||
-    (duplicates[2] > 1 && 4) ||
-    (duplicates[2] && 3) ||
-    2;
+    (flush && straight && 1) ||
+    (duplicates[4] && 2) ||
+    (duplicates[3] && duplicates[2] && 3) ||
+    (flush && 4) ||
+    (straight && 5) ||
+    (duplicates[3] && 6) ||
+    (duplicates[2] > 1 && 7) ||
+    (duplicates[2] && 8) ||
+    9;
 
   return { rank, value: faces.sort(byCountFirst).join('') };
 
   function byCountFirst(a, b) {
     //Counts are in reverse order - bigger is better
     const countDiff = counts[b] - counts[a];
-    if (countDiff) return countDiff; // If counts don't match return
+    if (countDiff) return countDiff;
     return b > a ? -1 : b === a ? 0 : 1;
   }
 
